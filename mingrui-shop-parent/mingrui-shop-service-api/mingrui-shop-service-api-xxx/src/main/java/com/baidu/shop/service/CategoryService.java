@@ -6,10 +6,7 @@ import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +23,10 @@ public interface CategoryService {
 
     @ApiModelProperty(value = "通过Id修改分类数据")
     @PutMapping(value = "category/update")
-    Result<JsonObject> UpdateCategoryById(@RequestBody CategoryEntity categoryEntity);
+    Result<JsonObject> updateCategoryById(@RequestBody CategoryEntity categoryEntity);
+
+    @ApiModelProperty(value = "新增数据")
+    @PostMapping(value = "category/save")
+    Result<JsonObject> addCategoryById(@RequestBody CategoryEntity categoryEntity);
 
 }
