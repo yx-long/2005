@@ -10,7 +10,7 @@ import javax.persistence.Table;
 public class BrandEntity {
 
     @Id
-    private Long id;
+    private Integer id;
 
     private String name;
 
