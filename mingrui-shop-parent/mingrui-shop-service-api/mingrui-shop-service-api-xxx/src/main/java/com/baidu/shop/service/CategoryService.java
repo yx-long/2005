@@ -2,10 +2,12 @@ package com.baidu.shop.service;
 
 import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.CategoryEntity;
+import com.baidu.shop.validate.group.MingruiOperation;
 import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,10 +25,10 @@ public interface CategoryService {
 
     @ApiModelProperty(value = "通过Id修改分类数据")
     @PutMapping(value = "category/update")
-    Result<JsonObject> updateCategoryById(@RequestBody CategoryEntity categoryEntity);
+    Result<JsonObject> updateCategoryById(@Validated({MingruiOperation.Update.class}) @RequestBody CategoryEntity categoryEntity);
 
     @ApiModelProperty(value = "新增数据")
     @PostMapping(value = "category/save")
-    Result<JsonObject> addCategoryById(@RequestBody CategoryEntity categoryEntity);
+    Result<JsonObject> addCategoryById(@Validated({MingruiOperation.Add.class}) @RequestBody CategoryEntity categoryEntity);
 
 }

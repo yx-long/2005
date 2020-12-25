@@ -27,6 +27,7 @@ public class GlobalException {
 
     @ExceptionHandler(value= MethodArgumentNotValidException.class)
     public Map<String,Object> methodArgumentNotValidHandler(MethodArgumentNotValidException exception) throws Exception{
+
         // == ===区别???
         HashMap<String, Object> map = new HashMap<>();
         map.put("code",HTTPStatus.PARAMS_VALIDATE_ERROR);
@@ -52,9 +53,6 @@ public class GlobalException {
             log.error("Field --> " + error.getField() + " : " + error.getDefaultMessage());
         });
 
-        //ArrayList 是线程不安全的 -->
-        //hadoop --> HDFS(存储数据\文件) mapreduce(计算)
-        //reverse   //gc --> gc垃圾回收器 ps + po
         String message = msgList.parallelStream().collect(Collectors.joining(","));
 
         map.put("massage",message);
