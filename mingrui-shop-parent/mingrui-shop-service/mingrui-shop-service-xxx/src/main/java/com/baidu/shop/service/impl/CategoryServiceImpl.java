@@ -5,6 +5,7 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.service.CategoryService;
+import com.baidu.shop.status.HTTPStatus;
 import com.baidu.shop.utils.ObjectUtil;
 import com.google.gson.JsonObject;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,13 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
     @Resource
     private CategoryMapper categoryMapper;
 
+    @Override
+    public Result<List<CategoryEntity>> brandCategoryByPid(Integer brandId) {
+
+        List<CategoryEntity> list = categoryMapper.brandCategoryByPid(brandId);
+        return this.setResultSuccess(list);
+    }
+
     @Transactional
     @Override
     public Result<JsonObject> addCategoryById(CategoryEntity categoryEntity) {
@@ -29,6 +37,7 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
         categoryMapper.updateByPrimaryKeySelective(parentCategoryEntity);
 
         categoryMapper.insertSelective(categoryEntity);
+
         return this.setResultSuccess();
     }
 
@@ -41,37 +50,43 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
+
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setParentId(pid);
         List<CategoryEntity> list = categoryMapper.select(categoryEntity);
+
         return this.setResultSuccess(list);
     }
 
     @Transactional
     @Override
     public Result<JsonObject> deleteCategoryById(Integer id) {
-        //查询id是否合法
-        if(ObjectUtil.isNull(id) || id <= 0 ) return this.setResultError("id不合法");
+        //校验id是否合法
+        if(ObjectUtil.isNull(id) || id <= 0) return this.setResultError(HTTPStatus.OPERATION_ERROR,"id不合法");
 
-        //查询当前节点是否存在
         CategoryEntity categoryEntity = categoryMapper.selectByPrimaryKey(id);
-        if(ObjectUtil.isNull(categoryEntity)) return this.setResultError("数据不存在");
 
-        //判断当前节点是否为父节点
-        if (categoryEntity.getParentId() == 1 ) return this.setResultError("当前节点为父节点");
+        if(ObjectUtil.isNull(categoryEntity)) return this.setResultError(HTTPStatus.OPERATION_ERROR,"数据不存在");
 
-        //对数据进行and拼接sql语句  select * from 表名 where 1=1 and parentId = ?
+        //判断当前节点是否为父节点(安全!)
+        if(categoryEntity.getIsParent() == 1) return this.setResultError(HTTPStatus.OPERATION_ERROR,"当前节点为父节点");//return之后的代码不会执行
+
+        //通过当前节点的父节点id 查询 当前节点(将要被删除的节点)的父节点下是否还有其他子节点
         Example example = new Example(CategoryEntity.class);
-        example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());
-        List<CategoryEntity> exampleList = categoryMapper.selectByExample(example);
+        example.createCriteria().andEqualTo("parentId", categoryEntity.getParentId());
 
-        if(exampleList.size() <= 1){
-            CategoryEntity categoryEntity1 = new CategoryEntity();
-            categoryEntity1.setParentId(0);
-            categoryEntity1.setId(categoryEntity1.getParentId());
+        List<CategoryEntity> categoryList = categoryMapper.selectByExample(example);
 
-            categoryMapper.updateByPrimaryKeySelective(categoryEntity1);
+        //如果size <= 1 --> 如果当前节点被删除的话 当前节点的父节点下没有节点了 --> 将当前节点的父节点状态改为叶子节点
+        if(categoryList.size() <= 1){
+
+            CategoryEntity updateCategoryEntity = new CategoryEntity();
+            updateCategoryEntity.setIsParent(0);
+            updateCategoryEntity.setId(categoryEntity.getParentId());
+
+            categoryMapper.updateByPrimaryKeySelective(updateCategoryEntity);
         }
+        //通过id删除节点
         categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }

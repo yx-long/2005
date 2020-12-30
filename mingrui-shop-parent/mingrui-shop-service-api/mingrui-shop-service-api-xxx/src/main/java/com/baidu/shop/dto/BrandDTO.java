@@ -2,6 +2,7 @@ package com.baidu.shop.dto;
 
 import com.baidu.shop.base.BaseDTO;
 import com.baidu.shop.validate.group.MingruiOperation;
+import com.github.pagehelper.PageHelper;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,5 +28,7 @@ public class BrandDTO extends BaseDTO {
     @ApiModelProperty(value = "品牌首字母")
     private String letter;
 
+    @ApiModelProperty(value = "品牌id集合")
+    private String categories;
 
 }
