@@ -27,7 +27,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     @Resource
     private SpceParamsMapper spceParamsMapper;
 
-    //查询
+    //规格参数查询
     @Override
     public Result<List<SpceParamsEntity>> spceParamsList(SpceParamsDTO spceParamsDTO) {
         SpceParamsEntity spceParamsEntity = BaiduBeanUtil.copyProperties(spceParamsDTO, SpceParamsEntity.class);
@@ -37,7 +37,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess(spceParamsEntities);
     }
 
-    //新增
+    //规格参数新增
     @Transactional
     @Override
     public Result<JSONObject> saveParamsList(SpceParamsDTO spceParamsDTO) {
@@ -46,7 +46,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess();
     }
 
-    //修改
+    //规格参数修改
     @Transactional
     @Override
     public Result<JSONObject> editParamsList(SpceParamsDTO spceParamsDTO) {
@@ -62,7 +62,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess();
     }
 
-    //参数组查询
+    //规格组查询
     @Override
     public Result<List<SpceGroupEntity>> spceGroupList(SpceGroupDTO spceGroupDTO) {
 
@@ -73,7 +73,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess(spceGroupEntities);
     }
 
-    //参数组修改
+    //规格组修改
     @Transactional
     @Override
     public Result<JSONObject> saveSpceGroup(SpceGroupDTO spceGroupDTO) {
@@ -81,7 +81,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess();
     }
 
-    //参数组修改
+    //规格组修改
     @Transactional
     @Override
     public Result<JSONObject> editSpceGroup(SpceGroupDTO spceGroupDTO) {
@@ -89,7 +89,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess();
     }
 
-    //参数组删除
+    //规格组删除
     @Transactional
     @Override
     public Result<JSONObject> deleteSpceGroup(Integer id) {
