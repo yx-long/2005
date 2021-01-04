@@ -54,7 +54,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess();
     }
 
-    //删除
+    //规格参数删除
     @Transactional
     @Override
     public Result<JSONObject> deleteParamsList(Integer id) {
