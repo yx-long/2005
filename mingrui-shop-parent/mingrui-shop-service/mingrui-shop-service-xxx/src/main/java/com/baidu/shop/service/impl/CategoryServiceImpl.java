@@ -2,7 +2,9 @@ package com.baidu.shop.service.impl;
 
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.entity.CategoryBrandEntity;
 import com.baidu.shop.entity.CategoryEntity;
+import com.baidu.shop.mapper.CategoryBrandMapper;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.service.CategoryService;
 import com.baidu.shop.status.HTTPStatus;
@@ -14,11 +16,15 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.List;
+
 @RestController
 public class CategoryServiceImpl extends BaseApiService implements CategoryService {
 
     @Resource
     private CategoryMapper categoryMapper;
+
+    @Resource
+    private CategoryBrandMapper categoryBrandMapper;
 
     @Override
     public Result<List<CategoryEntity>> brandCategoryByPid(Integer brandId) {
@@ -61,24 +67,27 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
     @Transactional
     @Override
     public Result<JsonObject> deleteCategoryById(Integer id) {
-        //校验id是否合法
-        if(ObjectUtil.isNull(id) || id <= 0) return this.setResultError(HTTPStatus.OPERATION_ERROR,"id不合法");
+
+        if (ObjectUtil.isNull(id) || id <= 0) return this.setResultError(HTTPStatus.OPERATION_ERROR, "id不合法");
 
         CategoryEntity categoryEntity = categoryMapper.selectByPrimaryKey(id);
 
-        if(ObjectUtil.isNull(categoryEntity)) return this.setResultError(HTTPStatus.OPERATION_ERROR,"数据不存在");
+        if (ObjectUtil.isNull(categoryEntity)) return this.setResultError(HTTPStatus.OPERATION_ERROR, "数据不存在");
 
-        //判断当前节点是否为父节点(安全!)
-        if(categoryEntity.getIsParent() == 1) return this.setResultError(HTTPStatus.OPERATION_ERROR,"当前节点为父节点");//return之后的代码不会执行
+        if (categoryEntity.getIsParent() == 1)
+            return this.setResultError(HTTPStatus.OPERATION_ERROR, "当前节点为父节点");
 
-        //通过当前节点的父节点id 查询 当前节点(将要被删除的节点)的父节点下是否还有其他子节点
+        Example example1 = new Example(CategoryBrandEntity.class);
+        example1.createCriteria().andEqualTo("categoryId", id);
+        List<CategoryBrandEntity> categoryBrandEntities1 = categoryBrandMapper.selectByExample(example1);
+        if (categoryBrandEntities1.size() != 0) return this.setResultError("被品牌绑定不能删除");
+
         Example example = new Example(CategoryEntity.class);
         example.createCriteria().andEqualTo("parentId", categoryEntity.getParentId());
 
         List<CategoryEntity> categoryList = categoryMapper.selectByExample(example);
 
-        //如果size <= 1 --> 如果当前节点被删除的话 当前节点的父节点下没有节点了 --> 将当前节点的父节点状态改为叶子节点
-        if(categoryList.size() <= 1){
+        if (categoryList.size() <= 1) {
 
             CategoryEntity updateCategoryEntity = new CategoryEntity();
             updateCategoryEntity.setIsParent(0);
@@ -86,7 +95,6 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
             categoryMapper.updateByPrimaryKeySelective(updateCategoryEntity);
         }
-        //通过id删除节点
         categoryMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }

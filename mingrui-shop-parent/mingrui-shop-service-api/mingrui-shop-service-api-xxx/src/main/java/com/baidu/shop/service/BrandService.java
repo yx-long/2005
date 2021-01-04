@@ -7,10 +7,7 @@ import com.baidu.shop.entity.BrandEntity;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "品牌接口")
 public interface BrandService {
@@ -25,6 +22,10 @@ public interface BrandService {
     @ApiOperation(value = "品牌修改")
     @PutMapping(value = "brand/save")
     Result<JSONObject> updateBrand(@RequestBody BrandDTO brandDTO);
+
+    @ApiOperation(value = "品牌删除")
+    @DeleteMapping(value = "brand/delete")
+    Result<JSONObject> deleteBrand(Integer id);
 
 
 }

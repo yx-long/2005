@@ -34,6 +34,14 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
 
+    @Override
+    public Result<JSONObject> deleteBrand(Integer id) {
+        brandMapper.deleteByPrimaryKey(id);
+
+        this.deleteCategoryBrandById(id);
+        return this.setResultSuccess();
+    }
+
     @Transactional
     @Override
     public Result<JSONObject> updateBrand(BrandDTO brandDTO) {
@@ -41,34 +49,9 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         brandEntity.setLetter(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().toCharArray()[0]), false).toCharArray()[0] + "");
         brandMapper.updateByPrimaryKeySelective(brandEntity);
 
-        Example example = new Example(CategoryBrandEntity.class);
-        example.createCriteria().andEqualTo("brandId", brandEntity.getId());
-        categoryBrandMapper.deleteByExample(example);
+        this.deleteCategoryBrandById(brandDTO.getId());
 
-        String categories = brandDTO.getCategories();
-        if (StringUtils.isEmpty(brandDTO.getCategories())) return this.setResultError("没有获取到分类");
-        List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
-
-        if (categories.contains(",")) {
-            /*String[] split = categories.split(",");
-            for(String s : split){
-                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-                categoryBrandEntity.setCategoryId(brandEntity.getId());
-                categoryBrandEntity.setBrandId(Integer.parseInt(s));
-                categoryBrandEntities.add(categoryBrandEntity);
-            }*/
-            categoryBrandMapper.insertList(Arrays.asList(categories.split(","))
-                    .stream()
-                    .map(categoryIdStr ->
-                            new CategoryBrandEntity(Integer.parseInt(categoryIdStr)
-                                    , brandEntity.getId()))
-                    .collect(Collectors.toList()));
-        } else {
-            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-            categoryBrandEntity.setCategoryId(brandEntity.getId());
-            categoryBrandEntity.setBrandId(Integer.parseInt(categories));
-            categoryBrandMapper.insertSelective(categoryBrandEntity);
-        }
+        this.addToList(brandDTO.getCategories(),brandEntity.getId());
 
         return this.setResultSuccess();
     }
@@ -81,34 +64,8 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         brandEntity.setLetter(String.valueOf(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().toCharArray()[0]), false).toCharArray()[0]));
         brandMapper.insertSelective(brandEntity);
 
-        String categories = brandDTO.getCategories();
-        if (StringUtils.isEmpty(brandDTO.getCategories())) return this.setResultError("没有获得集合");
+        this.addToList(brandDTO.getCategories(),brandEntity.getId());
 
-        List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
-        if (categories.contains(",")) {
-            //多个分类 --> 批量新增
-            categoryBrandMapper.insertList(
-                    Arrays.asList(categories.split(","))
-                            .stream()
-                            .map(categoryIdStr -> new CategoryBrandEntity(Integer.valueOf(categoryIdStr)
-                                    , brandEntity.getId()))
-                            .collect(Collectors.toList())
-            );
-        /*if(categories.contains(",")){
-            String[] split = categories.split(",");
-            for (String s : split) {
-                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-                categoryBrandEntity.setBrandId(brandEntity.getId());
-                categoryBrandEntity.setCategoryId(Integer.parseInt(s));
-                categoryBrandEntities.add(categoryBrandEntity);
-            }*/
-
-        } else {
-            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-            categoryBrandEntity.setBrandId(brandEntity.getId());
-            categoryBrandEntity.setCategoryId(Integer.parseInt(categories));
-            categoryBrandMapper.insertSelective(categoryBrandEntity);
-        }
         return this.setResultSuccess();
     }
 
@@ -127,5 +84,44 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         PageInfo<BrandEntity> pageInfo = new PageInfo<>(brandEntities);
 
         return this.setResultSuccess(pageInfo);
+    }
+
+    private void deleteCategoryBrandById(Integer id) {
+        Example example = new Example(CategoryBrandEntity.class);
+        example.createCriteria().andEqualTo("brandId", id);
+        categoryBrandMapper.deleteByExample(example);
+    }
+
+    private void addToList(String categories , Integer id){
+        if (StringUtils.isEmpty(categories)) throw new RuntimeException("没有获取到分类");
+        List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
+
+        if (categories.contains(",")) {
+            /*String[] split = categories.split(",");
+            for(String s : split){
+                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+                categoryBrandEntity.setCategoryId(brandEntity.getId());
+                categoryBrandEntity.setBrandId(Integer.parseInt(s));
+                categoryBrandEntities.add(categoryBrandEntity);
+            }*/
+           String[] categoryArr = categories.split(",");
+            List<String> strings = new ArrayList<>();
+            for (String str : categoryArr){
+                strings.add(str);
+            }
+            categoryBrandMapper.insertList(
+
+                    Arrays.asList(categories.split(","))
+                            .stream()
+                            .map(categoryIdStr ->
+                                    new CategoryBrandEntity(Integer.parseInt(categoryIdStr)
+                                            , id))
+                            .collect(Collectors.toList()));
+        } else {
+            CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
+            categoryBrandEntity.setCategoryId(id);
+            categoryBrandEntity.setBrandId(Integer.parseInt(categories));
+            categoryBrandMapper.insertSelective(categoryBrandEntity);
+        }
     }
 }

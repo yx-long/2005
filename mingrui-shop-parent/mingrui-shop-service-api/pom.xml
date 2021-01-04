@@ -11,12 +11,12 @@
 
     <artifactId>mingrui-shop-service-api</artifactId>
 
-    <!--父级项目不需要打包所有packging的类型为pom-->
-    <packaging>pom</packaging>
-
     <modules>
         <module>mingrui-shop-service-api-xxx</module>
     </modules>
+
+    <!--父级项目不需要打包所有packging的类型为pom-->
+    <packaging>pom</packaging>
 
     <dependencies>
         <!--分页工具-->
