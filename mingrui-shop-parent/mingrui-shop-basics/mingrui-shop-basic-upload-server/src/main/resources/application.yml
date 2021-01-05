@@ -5,6 +5,15 @@ spring:
   application:
     name: upload-server
 
+fdfs:
+  so-timeout: 1501
+  connect-timeout: 601
+  thumb-image:
+    width: 60
+    height: 60
+  tracker-list:
+    - 81.70.229.244:22122
+
 eureka:
   client:
     service-url:
@@ -14,6 +23,6 @@ baidu:
   upload:
     path:
       windows: D:\\images
-      linux: /yanxinlong/images
+      linux: /yxl/images
     img:
-     host: http://image.mrshop.com
+     host: http://81.70.229.244/

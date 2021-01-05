@@ -27,5 +27,4 @@ public interface BrandService {
     @DeleteMapping(value = "brand/delete")
     Result<JSONObject> deleteBrand(Integer id);
 
-
 }

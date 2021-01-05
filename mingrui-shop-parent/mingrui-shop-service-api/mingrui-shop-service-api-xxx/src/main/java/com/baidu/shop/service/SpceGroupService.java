@@ -43,7 +43,7 @@ public interface SpceGroupService {
     @ApiOperation(value = "规格修改")
     Result<JSONObject> editSpceGroup(@RequestBody SpceGroupDTO spceGroupDTO);
 
-        @DeleteMapping(value = "specgroup/delete/{id}")
+    @DeleteMapping(value = "specgroup/delete/{id}")
     @ApiOperation(value = "通过id删除规格")
     Result<JSONObject> deleteSpceGroup(@PathVariable Integer id);
 }
