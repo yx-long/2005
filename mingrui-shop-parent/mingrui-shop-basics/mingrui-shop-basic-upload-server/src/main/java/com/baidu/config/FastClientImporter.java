@@ -1,4 +1,4 @@
-package com.baidu.shop.upload.controller;
+package com.baidu.config;
 
 import com.github.tobato.fastdfs.FdfsClientConfig;
 import org.springframework.context.annotation.Configuration;
