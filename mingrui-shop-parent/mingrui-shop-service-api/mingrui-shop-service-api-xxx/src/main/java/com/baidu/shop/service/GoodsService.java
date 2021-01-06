@@ -8,11 +8,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
+
 @Api(tags = "商品接口")
 public interface GoodsService {
 
     @ApiOperation(value = "商品查询接口")
     @GetMapping(value = "goods/getSpuInfo")
-    Result<PageInfo<GoodsEntity>> getSpuInfo(GoodsDTO goodsDTO);
+    Result<List<GoodsDTO>> getSpuInfo(GoodsDTO goodsDTO);
 
 }

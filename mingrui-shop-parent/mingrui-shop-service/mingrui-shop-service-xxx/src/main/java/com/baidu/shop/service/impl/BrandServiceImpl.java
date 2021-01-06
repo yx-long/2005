@@ -34,9 +34,15 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     private CategoryBrandMapper categoryBrandMapper;
 
     @Override
+    public Result<List<BrandEntity>> categoryBrandById(Integer cid) {
+        List<BrandEntity> list = brandMapper.categoryBrandById(cid);
+        return this.setResultSuccess(list);
+    }
+
+    @Transactional
+    @Override
     public Result<JSONObject> deleteBrand(Integer id) {
         brandMapper.deleteByPrimaryKey(id);
-
         this.deleteCategoryBrandById(id);
         return this.setResultSuccess();
     }
@@ -50,7 +56,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
         this.deleteCategoryBrandById(brandDTO.getId());
 
-        this.addToList(brandDTO.getCategories(),brandEntity.getId());
+        this.addToList(brandDTO.getCategories(), brandEntity.getId());
 
         return this.setResultSuccess();
     }
@@ -63,7 +69,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         brandEntity.setLetter(String.valueOf(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().toCharArray()[0]), false).toCharArray()[0]));
         brandMapper.insertSelective(brandEntity);
 
-        this.addToList(brandDTO.getCategories(),brandEntity.getId());
+        this.addToList(brandDTO.getCategories(), brandEntity.getId());
 
         return this.setResultSuccess();
     }
@@ -77,7 +83,10 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
         PageHelper.startPage(brandDTO.getPage(), brandDTO.getRows());
         Example example = new Example(BrandEntity.class);
-        example.createCriteria().andLike("name", "%" + brandEntity.getName() + "%");
+
+        if (!StringUtils.isEmpty(brandEntity.getName())) {
+            example.createCriteria().andLike("name", "%" + brandEntity.getName() + "%");
+        }
 
         List<BrandEntity> brandEntities = brandMapper.selectByExample(example);
         PageInfo<BrandEntity> pageInfo = new PageInfo<>(brandEntities);
@@ -91,7 +100,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         categoryBrandMapper.deleteByExample(example);
     }
 
-    private void addToList(String categories , Integer id){
+    private void addToList(String categories, Integer id) {
         if (StringUtils.isEmpty(categories)) throw new RuntimeException("没有获取到分类");
         List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
 
@@ -103,13 +112,12 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
                 categoryBrandEntity.setBrandId(Integer.parseInt(s));
                 categoryBrandEntities.add(categoryBrandEntity);
             }*/
-           String[] categoryArr = categories.split(",");
+            String[] categoryArr = categories.split(",");
             List<String> strings = new ArrayList<>();
-            for (String str : categoryArr){
+            for (String str : categoryArr) {
                 strings.add(str);
             }
             categoryBrandMapper.insertList(
-
                     Arrays.asList(categories.split(","))
                             .stream()
                             .map(categoryIdStr ->

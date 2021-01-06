@@ -11,6 +11,7 @@ import com.baidu.shop.mapper.SpceGroupMapper;
 import com.baidu.shop.mapper.SpceParamsMapper;
 import com.baidu.shop.service.SpceGroupService;
 import com.baidu.shop.utils.BaiduBeanUtil;
+import com.baidu.shop.utils.ObjectUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
@@ -30,9 +31,18 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     //规格参数查询
     @Override
     public Result<List<SpceParamsEntity>> spceParamsList(SpceParamsDTO spceParamsDTO) {
+
         SpceParamsEntity spceParamsEntity = BaiduBeanUtil.copyProperties(spceParamsDTO, SpceParamsEntity.class);
+
         Example example = new Example(SpceParamsEntity.class);
-        example.createCriteria().andEqualTo("groupId",spceParamsEntity.getGroupId());
+        Example.Criteria criteria = example.createCriteria();
+
+        if (ObjectUtil.isNotNull(spceParamsEntity.getGroupId()))
+            criteria.andEqualTo("groupId", spceParamsEntity.getGroupId());
+
+        if (ObjectUtil.isNotNull(spceParamsEntity.getCid()))
+            criteria.andEqualTo("cid", spceParamsEntity.getCid());
+
         List<SpceParamsEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
         return this.setResultSuccess(spceParamsEntities);
     }
@@ -50,7 +60,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     @Transactional
     @Override
     public Result<JSONObject> editParamsList(SpceParamsDTO spceParamsDTO) {
-        spceParamsMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spceParamsDTO,SpceParamsEntity.class));
+        spceParamsMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spceParamsDTO, SpceParamsEntity.class));
         return this.setResultSuccess();
     }
 
@@ -67,8 +77,11 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     public Result<List<SpceGroupEntity>> spceGroupList(SpceGroupDTO spceGroupDTO) {
 
         Example example = new Example(SpceGroupEntity.class);
-        example.createCriteria().andEqualTo("cid",
-                BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class).getCid());
+        SpceGroupEntity spceGroupEntity = BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class);
+        Example.Criteria criteria = example.createCriteria();
+        if (ObjectUtil.isNotNull(spceGroupEntity.getCid()))
+            criteria.andEqualTo("cid", spceGroupEntity.getCid());
+
         List<SpceGroupEntity> spceGroupEntities = spceGroupMapper.selectByExample(example);
         return this.setResultSuccess(spceGroupEntities);
     }
@@ -77,7 +90,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     @Transactional
     @Override
     public Result<JSONObject> saveSpceGroup(SpceGroupDTO spceGroupDTO) {
-        spceGroupMapper.insertSelective(BaiduBeanUtil.copyProperties(spceGroupDTO,SpceGroupEntity.class));
+        spceGroupMapper.insertSelective(BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class));
         return this.setResultSuccess();
     }
 
@@ -85,7 +98,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     @Transactional
     @Override
     public Result<JSONObject> editSpceGroup(SpceGroupDTO spceGroupDTO) {
-        spceGroupMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spceGroupDTO,SpceGroupEntity.class));
+        spceGroupMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class));
         return this.setResultSuccess();
     }
 
@@ -97,7 +110,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         Example example = new Example(SpceParamsEntity.class);
         example.createCriteria().andEqualTo("groupId", id);
         List<SpceParamsEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
-        if(spceParamsEntities.size() != 0) return this.setResultError("该节点下有数据不能删除");
+        if (spceParamsEntities.size() != 0) return this.setResultError("该节点下有数据不能删除");
 
         spceGroupMapper.deleteByPrimaryKey(id);
 
