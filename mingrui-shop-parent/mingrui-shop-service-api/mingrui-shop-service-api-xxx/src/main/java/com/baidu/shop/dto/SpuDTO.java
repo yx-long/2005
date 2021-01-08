@@ -10,10 +10,11 @@ import lombok.Value;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @ApiModel(value = "spu数据传输DTO")
-public class GoodsDTO extends BaseDTO {
+public class SpuDTO extends BaseDTO {
 
     @ApiModelProperty(value = "主键", example = "1")
     @NotNull(message = "主键不能为空", groups = {MingruiOperation.Update.class})
@@ -57,5 +58,11 @@ public class GoodsDTO extends BaseDTO {
     private String brandName;
 
     private String categoryName;
+
+    @ApiModelProperty(value = "大字段数据")
+    private SpuDetailDTO spuDetail;
+
+    @ApiModelProperty(value = "sku属性数据集合")
+    private List<SkuDTO> skus;
 
 }
