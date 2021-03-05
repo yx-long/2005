@@ -8,6 +8,7 @@ import com.baidu.shop.dto.SpuDetailDTO;
 import com.baidu.shop.entity.SpuDetailEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface GoodsService {
 
     @ApiOperation(value = "商品查询接口")
     @GetMapping(value = "goods/getSpuInfo")
-    Result<List<SpuDTO>> getSpuInfo(SpuDTO spuDTO);
+    Result<List<SpuDTO>> getSpuInfo(@SpringQueryMap SpuDTO spuDTO);
 
     @ApiOperation(value = "商品新增")
     @PostMapping(value = "goods/save")
@@ -25,11 +26,11 @@ public interface GoodsService {
 
     @ApiOperation(value = "通过spuId查询spudetail信息")
     @GetMapping(value = "/goods/getSpuDetailBySpuId")
-    Result<SpuDetailEntity> getSpuDetailBySpuId(Integer spuId);
+    Result<SpuDetailEntity> getSpuDetailBySpuId(@RequestParam Integer spuId);
 
     @ApiOperation(value = "通过spuId查询sku信息")
     @GetMapping(value = "/goods/getSkusBySpuId")
-    Result<List<SkuDTO>> getSkusBySpuId(Integer spuId);
+    Result<List<SkuDTO>> getSkusBySpuId(@RequestParam Integer spuId);
 
     @ApiOperation(value = "商品修改")
     @PutMapping(value = "goods/save")

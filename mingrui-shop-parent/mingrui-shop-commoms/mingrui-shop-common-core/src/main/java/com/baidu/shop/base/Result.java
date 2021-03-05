@@ -15,4 +15,8 @@ public class Result<T> {
         this.message = message;
         this.data = (T) data;
     }
+
+    public Boolean isSuccess() {
+        return code == 200;
+    }
 }

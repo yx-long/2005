@@ -86,7 +86,7 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         return this.setResultSuccess(spceGroupEntities);
     }
 
-    //规格组修改
+    //规格组新增
     @Transactional
     @Override
     public Result<JSONObject> saveSpceGroup(SpceGroupDTO spceGroupDTO) {

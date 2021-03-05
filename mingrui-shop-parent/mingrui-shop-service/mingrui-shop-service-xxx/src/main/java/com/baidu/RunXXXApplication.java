@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import tk.mybatis.spring.annotation.MapperScan;
 
+import java.util.ArrayList;
+
 @SpringBootApplication
 @EnableEurekaClient
 @MapperScan("com.baidu.shop.mapper")

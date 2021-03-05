@@ -19,7 +19,7 @@ public interface CategoryService {
     @GetMapping(value = "category/list")
     Result<List<CategoryEntity>> getCategoryByPid(Integer pid);
 
-    @ApiOperation(value = "通过接口查询商品分类")
+    @ApiOperation(value = "查询品牌分类")
     @GetMapping(value = "category/brand")
     Result<List<CategoryEntity>> brandCategoryByPid(Integer brandId);
 

@@ -39,6 +39,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         return this.setResultSuccess(list);
     }
 
+	//品牌删除
     @Transactional
     @Override
     public Result<JSONObject> deleteBrand(Integer id) {
@@ -47,6 +48,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         return this.setResultSuccess();
     }
 
+	//品牌修改
     @Transactional
     @Override
     public Result<JSONObject> updateBrand(BrandDTO brandDTO) {
@@ -56,7 +58,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
 
         this.deleteCategoryBrandById(brandDTO.getId());
 
-        this.addToList(brandDTO.getCategories(), brandEntity.getId());
+        this.insertCategoryBrandList(brandDTO.getCategories(), brandEntity.getId());
 
         return this.setResultSuccess();
     }
@@ -69,7 +71,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         brandEntity.setLetter(String.valueOf(PinyinUtil.getUpperCase(String.valueOf(brandEntity.getName().toCharArray()[0]), false).toCharArray()[0]));
         brandMapper.insertSelective(brandEntity);
 
-        this.addToList(brandDTO.getCategories(), brandEntity.getId());
+        this.insertCategoryBrandList(brandDTO.getCategories(), brandEntity.getId());
 
         return this.setResultSuccess();
     }
@@ -100,34 +102,22 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         categoryBrandMapper.deleteByExample(example);
     }
 
-    private void addToList(String categories, Integer id) {
-        if (StringUtils.isEmpty(categories)) throw new RuntimeException("没有获取到分类");
-        List<CategoryBrandEntity> categoryBrandEntities = new ArrayList<>();
-
-        if (categories.contains(",")) {
-            /*String[] split = categories.split(",");
-            for(String s : split){
-                CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-                categoryBrandEntity.setCategoryId(brandEntity.getId());
-                categoryBrandEntity.setBrandId(Integer.parseInt(s));
-                categoryBrandEntities.add(categoryBrandEntity);
-            }*/
-            String[] categoryArr = categories.split(",");
-            List<String> strings = new ArrayList<>();
-            for (String str : categoryArr) {
-                strings.add(str);
-            }
+    private void insertCategoryBrandList(String categories, Integer brandId){
+        // 自定义异常
+        if(StringUtils.isEmpty(categories)) throw new RuntimeException("分类信息不能为空");
+        //判断分类集合字符串中是否包含,
+        if(categories.contains(",")){//多个分类 --> 批量新增
             categoryBrandMapper.insertList(
                     Arrays.asList(categories.split(","))
                             .stream()
-                            .map(categoryIdStr ->
-                                    new CategoryBrandEntity(Integer.parseInt(categoryIdStr)
-                                            , id))
-                            .collect(Collectors.toList()));
-        } else {
+                            .map(categoryIdStr -> new CategoryBrandEntity(Integer.valueOf(categoryIdStr)
+                                    ,brandId))
+                            .collect(Collectors.toList())
+            );
+        }else{//普通单个新增
             CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
-            categoryBrandEntity.setCategoryId(id);
-            categoryBrandEntity.setBrandId(Integer.parseInt(categories));
+            categoryBrandEntity.setBrandId(brandId);
+            categoryBrandEntity.setCategoryId(Integer.valueOf(categories));
             categoryBrandMapper.insertSelective(categoryBrandEntity);
         }
     }
