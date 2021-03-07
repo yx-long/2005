@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class CategoryServiceImpl extends BaseApiService implements CategoryService {
@@ -25,6 +27,13 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Resource
     private CategoryBrandMapper categoryBrandMapper;
+
+    @Override
+    public Result<List<CategoryEntity>> getCateByIds(String cateIds) {
+        List<Integer> categoryList = Arrays.asList(cateIds.split(",")).stream().map(ids -> Integer.valueOf(ids)).collect(Collectors.toList());
+        List<CategoryEntity> categoryEntities = categoryMapper.selectByIdList(categoryList);
+        return this.setResultSuccess(categoryEntities);
+    }
 
     @Override
     public Result<List<CategoryEntity>> brandCategoryByPid(Integer brandId) {

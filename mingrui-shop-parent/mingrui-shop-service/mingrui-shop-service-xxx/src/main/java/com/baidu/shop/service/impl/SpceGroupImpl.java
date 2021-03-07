@@ -4,9 +4,10 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SpceGroupDTO;
-import com.baidu.shop.dto.SpceParamsDTO;
+import com.baidu.shop.dto.SpecParamDTO;
+import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.entity.SpceGroupEntity;
-import com.baidu.shop.entity.SpceParamsEntity;
+import com.baidu.shop.entity.SpecParamEntity;
 import com.baidu.shop.mapper.SpceGroupMapper;
 import com.baidu.shop.mapper.SpceParamsMapper;
 import com.baidu.shop.service.SpceGroupService;
@@ -30,37 +31,37 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
 
     //规格参数查询
     @Override
-    public Result<List<SpceParamsEntity>> spceParamsList(SpceParamsDTO spceParamsDTO) {
+    public Result<List<SpecParamEntity>> getSpceParamsList(SpecParamDTO specParamDTO) {
 
-        SpceParamsEntity spceParamsEntity = BaiduBeanUtil.copyProperties(spceParamsDTO, SpceParamsEntity.class);
+        SpecParamEntity specParamEntity = BaiduBeanUtil.copyProperties(specParamDTO, SpecParamEntity.class);
 
-        Example example = new Example(SpceParamsEntity.class);
+        Example example = new Example(SpecParamEntity.class);
         Example.Criteria criteria = example.createCriteria();
 
-        if (ObjectUtil.isNotNull(spceParamsEntity.getGroupId()))
-            criteria.andEqualTo("groupId", spceParamsEntity.getGroupId());
+        if (ObjectUtil.isNotNull(specParamEntity.getGroupId()))
+            criteria.andEqualTo("groupId", specParamEntity.getGroupId());
 
-        if (ObjectUtil.isNotNull(spceParamsEntity.getCid()))
-            criteria.andEqualTo("cid", spceParamsEntity.getCid());
+        if (ObjectUtil.isNotNull(specParamEntity.getCid()))
+            criteria.andEqualTo("cid", specParamEntity.getCid());
 
-        List<SpceParamsEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
+        List<SpecParamEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
         return this.setResultSuccess(spceParamsEntities);
     }
 
     //规格参数新增
     @Transactional
     @Override
-    public Result<JSONObject> saveParamsList(SpceParamsDTO spceParamsDTO) {
-        SpceParamsEntity spceParamsEntity = BaiduBeanUtil.copyProperties(spceParamsDTO, SpceParamsEntity.class);
-        spceParamsMapper.insertSelective(spceParamsEntity);
+    public Result<JSONObject> saveParamsList(SpecParamDTO specParamDTO) {
+        SpecParamEntity specParamEntity = BaiduBeanUtil.copyProperties(specParamDTO, SpecParamEntity.class);
+        spceParamsMapper.insertSelective(specParamEntity);
         return this.setResultSuccess();
     }
 
     //规格参数修改
     @Transactional
     @Override
-    public Result<JSONObject> editParamsList(SpceParamsDTO spceParamsDTO) {
-        spceParamsMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spceParamsDTO, SpceParamsEntity.class));
+    public Result<JSONObject> editParamsList(SpecParamDTO specParamDTO) {
+        spceParamsMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(specParamDTO, SpecParamEntity.class));
         return this.setResultSuccess();
     }
 
@@ -107,9 +108,9 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
     @Override
     public Result<JSONObject> deleteSpceGroup(Integer id) {
 
-        Example example = new Example(SpceParamsEntity.class);
+        Example example = new Example(SpecParamEntity.class);
         example.createCriteria().andEqualTo("groupId", id);
-        List<SpceParamsEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
+        List<SpecParamEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
         if (spceParamsEntities.size() != 0) return this.setResultError("该节点下有数据不能删除");
 
         spceGroupMapper.deleteByPrimaryKey(id);

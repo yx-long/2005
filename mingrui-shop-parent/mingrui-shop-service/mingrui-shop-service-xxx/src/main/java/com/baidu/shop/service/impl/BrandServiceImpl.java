@@ -34,12 +34,19 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
     private CategoryBrandMapper categoryBrandMapper;
 
     @Override
+    public Result<List<BrandEntity>> getBrandByIds(String brandIds) {
+        List<Integer> brandList = Arrays.asList(brandIds.split(",")).stream().map(ids -> Integer.valueOf(ids)).collect(Collectors.toList());
+        List<BrandEntity> brandEntities = brandMapper.selectByIdList(brandList);
+        return setResultSuccess(brandEntities);
+    }
+
+    @Override
     public Result<List<BrandEntity>> categoryBrandById(Integer cid) {
         List<BrandEntity> list = brandMapper.categoryBrandById(cid);
         return this.setResultSuccess(list);
     }
 
-	//品牌删除
+    //品牌删除
     @Transactional
     @Override
     public Result<JSONObject> deleteBrand(Integer id) {
@@ -48,7 +55,7 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         return this.setResultSuccess();
     }
 
-	//品牌修改
+    //品牌修改
     @Transactional
     @Override
     public Result<JSONObject> updateBrand(BrandDTO brandDTO) {
@@ -102,19 +109,19 @@ public class BrandServiceImpl extends BaseApiService implements BrandService {
         categoryBrandMapper.deleteByExample(example);
     }
 
-    private void insertCategoryBrandList(String categories, Integer brandId){
+    private void insertCategoryBrandList(String categories, Integer brandId) {
         // 自定义异常
-        if(StringUtils.isEmpty(categories)) throw new RuntimeException("分类信息不能为空");
+        if (StringUtils.isEmpty(categories)) throw new RuntimeException("分类信息不能为空");
         //判断分类集合字符串中是否包含,
-        if(categories.contains(",")){//多个分类 --> 批量新增
+        if (categories.contains(",")) {//多个分类 --> 批量新增
             categoryBrandMapper.insertList(
                     Arrays.asList(categories.split(","))
                             .stream()
                             .map(categoryIdStr -> new CategoryBrandEntity(Integer.valueOf(categoryIdStr)
-                                    ,brandId))
+                                    , brandId))
                             .collect(Collectors.toList())
             );
-        }else{//普通单个新增
+        } else {//普通单个新增
             CategoryBrandEntity categoryBrandEntity = new CategoryBrandEntity();
             categoryBrandEntity.setBrandId(brandId);
             categoryBrandEntity.setCategoryId(Integer.valueOf(categories));

@@ -3,9 +3,10 @@ package com.baidu.shop.service;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SpceGroupDTO;
-import com.baidu.shop.dto.SpceParamsDTO;
+import com.baidu.shop.dto.SpecParamDTO;
+import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.entity.SpceGroupEntity;
-import com.baidu.shop.entity.SpceParamsEntity;
+import com.baidu.shop.entity.SpecParamEntity;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.SpringQueryMap;
@@ -18,15 +19,15 @@ public interface SpceGroupService {
 
     @GetMapping(value = "specparams/list")
     @ApiOperation(value = "查询规格参数")
-    Result<List<SpceParamsEntity>> spceParamsList(@SpringQueryMap SpceParamsDTO spceParamsDTO);
+    Result<List<SpecParamEntity>> getSpceParamsList(@SpringQueryMap SpecParamDTO specParamDTO);
 
     @PostMapping(value = "specparams/save")
     @ApiOperation(value = "新增规格参数")
-    Result<JSONObject> saveParamsList(@RequestBody SpceParamsDTO spceParamsDTO);
+    Result<JSONObject> saveParamsList(@RequestBody SpecParamDTO specParamDTO);
 
     @PutMapping(value = "specparams/save")
     @ApiOperation(value = "新增规格参数")
-    Result<JSONObject> editParamsList(@RequestBody SpceParamsDTO spceParamsDTO);
+    Result<JSONObject> editParamsList(@RequestBody SpecParamDTO specParamDTO);
 
     @DeleteMapping(value = "specparams/delete/{id}")
     @ApiOperation(value = "新增规格参数")
@@ -47,4 +48,5 @@ public interface SpceGroupService {
     @DeleteMapping(value = "specGroup/delete/{id}")
     @ApiOperation(value = "通过id删除规格")
     Result<JSONObject> deleteSpceGroup(@PathVariable Integer id);
+
 }

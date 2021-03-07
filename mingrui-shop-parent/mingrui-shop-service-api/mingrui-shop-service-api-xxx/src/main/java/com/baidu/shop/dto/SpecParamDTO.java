@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 @ApiModel(value = "规格参数数据传输DTO")
 @Data
-public class SpceParamsDTO extends BaseDTO {
+public class SpecParamDTO extends BaseDTO {
 
     @ApiModelProperty(value = "主键", example = "1")
     @NotNull(message = "主键不能为空", groups = {MingruiOperation.Update.class})

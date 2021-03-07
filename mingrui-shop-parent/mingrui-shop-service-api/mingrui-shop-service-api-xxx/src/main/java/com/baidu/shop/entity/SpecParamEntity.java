@@ -8,7 +8,7 @@ import javax.persistence.Table;
 
 @Data
 @Table(name = "tb_spec_param")
-public class SpceParamsEntity {
+public class SpecParamEntity {
 
     @Id
     private Integer id;
