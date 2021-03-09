@@ -17,7 +17,7 @@ public interface CategoryService {
 
     @ApiOperation(value = "通过接口查询商品分类")
     @GetMapping(value = "category/list")
-    Result<List<CategoryEntity>> getCategoryByPid(Integer pid);
+    Result<List<CategoryEntity>> getCategoryByPid(@RequestParam Integer pid);
 
     @ApiOperation(value = "查询品牌分类")
     @GetMapping(value = "category/brand")

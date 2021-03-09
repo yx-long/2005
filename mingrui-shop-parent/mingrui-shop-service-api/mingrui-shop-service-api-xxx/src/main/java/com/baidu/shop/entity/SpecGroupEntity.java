@@ -7,7 +7,7 @@ import javax.persistence.Table;
 
 @Data
 @Table(name = "tb_spec_group")
-public class SpceGroupEntity {
+public class SpecGroupEntity {
 
     @Id
     private Integer id;

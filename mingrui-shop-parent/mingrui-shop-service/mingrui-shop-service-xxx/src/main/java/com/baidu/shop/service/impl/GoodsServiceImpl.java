@@ -102,6 +102,8 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         //判断标题是否为空 不为空就进行模糊查询
         if (!StringUtils.isEmpty(spuDTO.getTitle()))
             criteria.andLike("title", "%" + spuDTO.getTitle() + "%");
+        if (ObjectUtil.isNotNull(spuDTO.getId()))
+            criteria.andEqualTo("id", spuDTO.getId());
         //通过example查询分页和排序返回一个集合
         List<SpuEntity> goodsEntities = spuMapper.selectByExample(example);
         //通过lamdba表达式遍历查询返回一个集合

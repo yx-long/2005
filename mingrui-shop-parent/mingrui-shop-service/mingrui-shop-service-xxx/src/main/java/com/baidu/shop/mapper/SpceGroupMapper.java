@@ -1,7 +1,7 @@
 package com.baidu.shop.mapper;
 
-import com.baidu.shop.entity.SpceGroupEntity;
+import com.baidu.shop.entity.SpecGroupEntity;
 import tk.mybatis.mapper.common.Mapper;
 
-public interface SpceGroupMapper extends Mapper<SpceGroupEntity> {
+public interface SpceGroupMapper extends Mapper<SpecGroupEntity> {
 }

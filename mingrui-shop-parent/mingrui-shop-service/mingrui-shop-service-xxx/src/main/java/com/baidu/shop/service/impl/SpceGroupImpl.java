@@ -3,10 +3,9 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
-import com.baidu.shop.dto.SpceGroupDTO;
+import com.baidu.shop.dto.SpecGroupDTO;
 import com.baidu.shop.dto.SpecParamDTO;
-import com.baidu.shop.entity.CategoryEntity;
-import com.baidu.shop.entity.SpceGroupEntity;
+import com.baidu.shop.entity.SpecGroupEntity;
 import com.baidu.shop.entity.SpecParamEntity;
 import com.baidu.shop.mapper.SpceGroupMapper;
 import com.baidu.shop.mapper.SpceParamsMapper;
@@ -44,6 +43,9 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
         if (ObjectUtil.isNotNull(specParamEntity.getCid()))
             criteria.andEqualTo("cid", specParamEntity.getCid());
 
+        if (ObjectUtil.isNotNull(specParamDTO.getGeneric()))
+            criteria.andEqualTo("generic", specParamEntity.getGeneric());
+
         List<SpecParamEntity> spceParamsEntities = spceParamsMapper.selectByExample(example);
         return this.setResultSuccess(spceParamsEntities);
     }
@@ -75,31 +77,35 @@ public class SpceGroupImpl extends BaseApiService implements SpceGroupService {
 
     //规格组查询
     @Override
-    public Result<List<SpceGroupEntity>> spceGroupList(SpceGroupDTO spceGroupDTO) {
+    public Result<List<SpecGroupEntity>> spceGroupList(SpecGroupDTO specGroupDTO) {
 
-        Example example = new Example(SpceGroupEntity.class);
-        SpceGroupEntity spceGroupEntity = BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class);
+        Example example = new Example(SpecGroupEntity.class);
+        SpecGroupEntity specGroupEntity = BaiduBeanUtil.copyProperties(specGroupDTO, SpecGroupEntity.class);
         Example.Criteria criteria = example.createCriteria();
-        if (ObjectUtil.isNotNull(spceGroupEntity.getCid()))
-            criteria.andEqualTo("cid", spceGroupEntity.getCid());
 
-        List<SpceGroupEntity> spceGroupEntities = spceGroupMapper.selectByExample(example);
+        if (ObjectUtil.isNotNull(specGroupEntity.getId()))
+            criteria.andEqualTo("groupId", specGroupEntity.getId());
+
+        if (ObjectUtil.isNotNull(specGroupEntity.getCid()))
+            criteria.andEqualTo("cid", specGroupEntity.getCid());
+
+        List<SpecGroupEntity> spceGroupEntities = spceGroupMapper.selectByExample(example);
         return this.setResultSuccess(spceGroupEntities);
     }
 
     //规格组新增
     @Transactional
     @Override
-    public Result<JSONObject> saveSpceGroup(SpceGroupDTO spceGroupDTO) {
-        spceGroupMapper.insertSelective(BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class));
+    public Result<JSONObject> saveSpceGroup(SpecGroupDTO specGroupDTO) {
+        spceGroupMapper.insertSelective(BaiduBeanUtil.copyProperties(specGroupDTO, SpecGroupEntity.class));
         return this.setResultSuccess();
     }
 
     //规格组修改
     @Transactional
     @Override
-    public Result<JSONObject> editSpceGroup(SpceGroupDTO spceGroupDTO) {
-        spceGroupMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(spceGroupDTO, SpceGroupEntity.class));
+    public Result<JSONObject> editSpceGroup(SpecGroupDTO specGroupDTO) {
+        spceGroupMapper.updateByPrimaryKeySelective(BaiduBeanUtil.copyProperties(specGroupDTO, SpecGroupEntity.class));
         return this.setResultSuccess();
     }
 

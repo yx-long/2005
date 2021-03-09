@@ -7,6 +7,7 @@ import com.baidu.shop.entity.BrandEntity;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 public interface BrandService {
     @ApiOperation(value = "品牌查询")
     @GetMapping(value = "brand/list")
-    Result<PageInfo<BrandEntity>> bandList(BrandDTO brandDTO);
+    Result<PageInfo<BrandEntity>> bandList(@SpringQueryMap BrandDTO brandDTO);
 
     @ApiOperation(value = "品牌新增")
     @PostMapping(value = "brand/save")
