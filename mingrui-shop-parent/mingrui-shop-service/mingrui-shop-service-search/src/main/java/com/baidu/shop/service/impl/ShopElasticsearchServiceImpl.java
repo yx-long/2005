@@ -59,6 +59,23 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
     @Autowired
     private CategoryFeign categoryFeign;
 
+    @Override
+    public Result<JSONObject> saveData(Integer spuId) {
+        SpuDTO spuDTO = new SpuDTO();
+        spuDTO.setId(spuId);
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(spuDTO);
+        elasticsearchRestTemplate.save(goodsDocs.get(0));
+        return this.setResultSuccess();
+    }
+
+    @Override
+    public Result<JSONObject> delData(Integer spuId) {
+        GoodsDoc goodsDoc = new GoodsDoc();
+        goodsDoc.setId(spuId.longValue());
+        elasticsearchRestTemplate.delete(goodsDoc);
+        return this.setResultSuccess();
+    }
+
     //查询
     @Override
     public GoodsResponse search(String search, Integer page, String filter) {
@@ -211,7 +228,8 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
             indexOperations.create();
             indexOperations.createMapping();
         }
-        elasticsearchRestTemplate.save(esGoodsInfo());
+        List<GoodsDoc> goodsDocs = this.esGoodsInfo(new SpuDTO());
+        elasticsearchRestTemplate.save(goodsDocs);
         return this.setResultSuccess();
     }
 
@@ -224,8 +242,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
         return setResultSuccess("删除成功");
     }
 
-    private List<GoodsDoc> esGoodsInfo() {
-        SpuDTO spuDTO = new SpuDTO();
+    private List<GoodsDoc> esGoodsInfo(SpuDTO spuDTO) {
         Result<List<SpuDTO>> spuInfo = goodsFeign.getSpuInfo(spuDTO);
         if (spuInfo.isSuccess()) {
             List<SpuDTO> spuList = spuInfo.getData();
@@ -253,6 +270,7 @@ public class ShopElasticsearchServiceImpl extends BaseApiService implements Shop
                 goodsDoc.setSpecs(specMap);
                 return goodsDoc;
             }).collect(Collectors.toList());
+
             return goodsDocList;
         }
         return null;

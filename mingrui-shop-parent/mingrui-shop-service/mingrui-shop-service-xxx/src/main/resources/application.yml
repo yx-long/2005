@@ -2,6 +2,20 @@ server:
   port: 8100
 
 spring:
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    # 是否确认回调
+    publisher-confirm-type: correlated
+    # 是否返回回调
+    publisher-returns: true
+    virtual-host: /
+    # 手动确认
+    listener:
+      simple:
+        acknowledge-mode: manual
   application:
     name: xxx-server
     # 配置数据源
@@ -18,7 +32,7 @@ spring:
     # boot2.0+使用hikari作为默认数据库连接池
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
-    # 是否自动提交事务 默认
+      # 是否自动提交事务 默认
       auto-commit: true
       # 允许的最小连接数
       minimum-idle: 5

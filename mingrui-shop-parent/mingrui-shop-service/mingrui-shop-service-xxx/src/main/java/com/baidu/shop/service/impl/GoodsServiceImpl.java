@@ -3,6 +3,8 @@ package com.baidu.shop.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
+import com.baidu.shop.component.MrRabbitMQ;
+import com.baidu.shop.constant.MqMessageConstant;
 import com.baidu.shop.dto.SkuDTO;
 import com.baidu.shop.dto.SpuDTO;
 import com.baidu.shop.dto.SpuDetailDTO;
@@ -15,6 +17,7 @@ import com.baidu.shop.utils.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Example;
@@ -45,6 +48,9 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
 
     @Resource
     private SpuDetailMapper spuDetailMapper;
+
+    @Autowired
+    private MrRabbitMQ mrRabbitMQ;
 
     @Transactional
     @Override
@@ -125,9 +131,16 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
     }
 
     //商品新增
-    @Transactional
     @Override
     public Result<JSONObject> goodsSave(SpuDTO spuDTO) {
+        Integer spuId = goodsSaveTransactional(spuDTO);
+        mrRabbitMQ.send(spuId + "", MqMessageConstant.SPU_ROUT_KEY_SAVE);
+        //成功返回
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    public Integer goodsSaveTransactional(SpuDTO spuDTO) {
         //保证时间一致性不会发生改变
         final Date date = new Date();
         //spu新增
@@ -151,16 +164,20 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         //执行新增
         spuDetailMapper.insertSelective(spuDetailEntity);
         //新增代码重复提取到外面进行了封装
-        this.addOrPutGoods(spuDTO, spuDTO.getId(), date);
-        //成功返回
-        return this.setResultSuccess();
+        this.addOrPutGoods(spuDTO, spuEntity.getId(), date);
+        return spuEntity.getId();
     }
 
     //商品修改
-    @Transactional
     @Override
     public Result<JSONObject> goodsEdit(SpuDTO spuDTO) {
+        goodsEditTransactional(spuDTO);
+        mrRabbitMQ.send(spuDTO.getId() + "", MqMessageConstant.SPU_ROUT_KEY_UPDATE);
+        return this.setResultSuccess();
+    }
 
+    @Transactional
+    public void goodsEditTransactional(SpuDTO spuDTO) {
         final Date date = new Date();
         //修改spu
         SpuEntity spuEntity = BaiduBeanUtil.copyProperties(spuDTO, SpuEntity.class);
@@ -172,20 +189,24 @@ public class GoodsServiceImpl extends BaseApiService implements GoodsService {
         this.deleteGoods(spuEntity.getId());
         //执行新增
         this.addOrPutGoods(spuDTO, spuEntity.getId(), date);
-        return this.setResultSuccess();
     }
 
     //商品删除
-    @Transactional
     @Override
     public Result<JSONObject> deleteSkusBySpuId(Integer spuId) {
+        deleteSkusBySpuIdTransactional(spuId);
+        mrRabbitMQ.send(spuId + "", MqMessageConstant.SPU_ROUT_KEY_DELETE);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    public void deleteSkusBySpuIdTransactional(Integer spuId) {
         //通过spuId删除spu表中的数据
         spuMapper.deleteByPrimaryKey(spuId);
         //通过spuId删除spuDetail中的数据
         spuDetailMapper.deleteByPrimaryKey(spuId);
         //批量删除sku和stock中的数据
         this.deleteGoods(spuId);
-        return this.setResultSuccess();
     }
 
     //删除封装
