@@ -210,17 +210,17 @@
                             <div class="fl title">
                                 <div class="control-group">
                                     <div class="controls">
-                                        <input autocomplete="off" type="text" disabled value="1" minnum="1"
+                                        <input autocomplete="off" type="text" disabled :value="num" minnum="1"
                                                class="itxt"/>
-                                        <a href="javascript:void(0)" class="increment plus">+</a>
-                                        <a href="javascript:void(0)" class="increment mins">-</a>
+                                        <a href="javascript:void(0)" class="increment plus" @click="increment">+</a>
+                                        <a href="javascript:void(0)" class="increment mins" @click="decrement">-</a>
                                     </div>
                                 </div>
                             </div>
                             <div class="fl">
                                 <ul class="btn-choose unstyled">
                                     <li>
-                                        <a href="success-cart.html" target="_blank"
+                                        <a href="success-cart.html" @click.prevent="addCar"
                                            class="sui-btn  btn-danger addshopcar">加入购物车</a>
                                     </li>
                                 </ul>
@@ -450,7 +450,8 @@
                                     <div class="Ptable-item" v-for="(group,index) in specGroupParam"
                                          :key="index">
                                         <h3>{{ group.name }}</h3>
-                                        <dl v-for="(param,i) in group.specList" v-if=" group.specList.length > 0 " :key="i">
+                                        <dl v-for="(param,i) in group.specList" v-if=" group.specList.length > 0 "
+                                            :key="i">
                                             <dt>{{ param.name }}</dt>
                                             <dd>{{ genericSpec[param.id] }}</dd>
                                         </dl>
@@ -630,7 +631,52 @@
             mrshop,
             spuDetail,
             specGroupParam,
-            genericSpec
+            genericSpec,
+            num: 1
+        },
+        methods: {
+            addCar() {
+                mrshop.checkUserIsLogin().then(() => {
+                    mrshop.http.post('/car/car/addCar', {
+                        skuId: this.sku.id,
+                        num: this.num
+                    }).then(resp => {
+                        window.location.href = '../success-cart.html';
+                    }).catch(error => console.log(error));
+                }).catch(() => {
+                    let carList = mrshop.store.get(mrshop.CAR_LIST) || [];
+                    const oldGoods = carList.find(goods => goods.skuId == this.sku.id);
+                    if (oldGoods) {
+                        oldGoods.num += this.num;
+                    } else {
+                        const car = {
+                            skuId: this.sku.id,
+                            title: this.sku.title,
+                            image: this.images.length > 0 ? this.images[0] : '',
+                            price: this.sku.price,
+                            num: this.num,
+                            ownSpec: this.ownSpec
+                        };
+                        carList.push(car);//想数组中放元素
+                    }
+                    mrshop.store.set(mrshop.CAR_LIST, carList);//将购物车数据放到localStorage中
+                    window.location.href = '../success-cart.html';
+                })
+            },
+            increment() {
+                if (this.num < this.sku.stock) this.num++;
+            },
+            decrement() {
+                if (this.num > 1) this.num--;
+            },
+            ownSpec() {
+                const ownSpecJson = JSON.parse(this.sku.ownSpec);
+                let obj = {};
+                Object.keys(ownSpecJson).forEach(key => {
+                    obj[this.specParamMap[key]] = ownSpecJson[key];
+                });
+                return obj;
+            }
         },
         computed: {
             sku() {

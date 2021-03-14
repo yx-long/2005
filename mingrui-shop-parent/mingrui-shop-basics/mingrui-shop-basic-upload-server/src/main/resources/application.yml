@@ -9,8 +9,8 @@ fdfs:
   so-timeout: 1501
   connect-timeout: 601
   thumb-image:
-    width: 60
-    height: 60
+    width: 400
+    height: 400
   tracker-list:
     - 81.70.229.244:22122
 

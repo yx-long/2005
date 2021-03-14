@@ -16,13 +16,17 @@ import java.util.List;
 @Api(tags = "用户接口")
 public interface UserService {
 
+    @ApiOperation(value = "校👁验证码是否正确")
+    @GetMapping(value = "user/checkCode")
+    Result<List<UserEntity>> checkCode(String phone, String code);
+
     @ApiOperation(value = "用户注册")
     @PostMapping(value = "user/register")
     Result<JSONObject> register(@RequestBody UserDTO userDTO);
 
     @ApiOperation(value = "校验用户名或手机号唯一")
-    @GetMapping(value = "user/check/{value}/{type}")
-    Result<List<UserEntity>> checkUserNameOrPhone(@PathVariable(value = "value") String value, @PathVariable(value = "type") Integer type);
+    @GetMapping(value = "user/check")
+    Result<List<UserEntity>> checkUserNameOrPhone(String value, Integer type);
 
     @ApiOperation(value = "给手机号发送验证码")
     @PostMapping(value = "user/sendValidCode")

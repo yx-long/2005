@@ -219,7 +219,6 @@ public class TemplateServiceImpl extends BaseApiService implements TemplateServi
                 return specGroupDTO1;
 
             }).collect(Collectors.toList());
-
         }
         return specGroupAndParam;
     }
@@ -232,9 +231,7 @@ public class TemplateServiceImpl extends BaseApiService implements TemplateServi
         Result<List<SpecParamEntity>> spceParamsResult = specParamFeign.getSpceParamsList(specParamDTO);
         if (spceParamsResult.isSuccess()) {
             List<SpecParamEntity> specParamEntityList = spceParamsResult.getData();
-
             specParamEntityList.stream().forEach(specParam -> specParamMap.put(specParam.getId(), specParam.getName()));
-
         }
         return specParamMap;
     }
