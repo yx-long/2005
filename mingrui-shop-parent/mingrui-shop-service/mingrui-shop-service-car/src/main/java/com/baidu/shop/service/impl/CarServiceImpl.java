@@ -39,6 +39,19 @@ public class CarServiceImpl extends BaseApiService implements CarService {
     private GoodsFeign goodsFeign;
 
     @Override
+    public Result<JSONObject> carcarNumUpdate(String token, Long skuId, Integer type) {
+        try {
+            UserInfo userInfo = JwtUtils.getInfoFromToken(token, jwtConfig.getPublicKey());
+            Car car = redisRepository.getHash(GOODS_CAR_PRE + userInfo.getId(), skuId + "", Car.class);
+            car.setNum(type == 1 ? car.getNum() + 1 : car.getNum() - 1);
+            redisRepository.setHash(GOODS_CAR_PRE + userInfo.getId(), skuId + "", JSONUtil.toJsonString(car));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return this.setResultSuccess();
+    }
+
+    @Override
     public Result<JSONObject> mergeCar(String carList, String token) {
         //将string类型的字符串({carList:[]})转换成json对象
         com.alibaba.fastjson.JSONObject jsonObject = com.alibaba.fastjson.JSONObject.parseObject(carList);
@@ -48,13 +61,13 @@ public class CarServiceImpl extends BaseApiService implements CarService {
         List<Car> carsList = carListJsonArray.toJavaList(Car.class);
 
         carsList.stream().forEach(car -> {
-            this.addCar(car,token);
+            this.addCar(car, token);
         });
         return this.setResultSuccess();
     }
 
     @Override
-    public Result<List<Car>> getUserCar( String token) {
+    public Result<List<Car>> getUserCar(String token) {
         List<Car> cars = new ArrayList<>();
         try {
             UserInfo userInfo = JwtUtils.getInfoFromToken(token, jwtConfig.getPublicKey());

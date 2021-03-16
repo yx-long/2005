@@ -31,7 +31,9 @@ public class UserOauthController extends BaseApiService {
     public Result<UserInfo> verify(@CookieValue(value = "MRSHOP_TOKEN") String token, HttpServletRequest request, HttpServletResponse response) {
         UserInfo userInfo = null;
         try {
+            // 解析用户token
             userInfo = JwtUtils.getInfoFromToken(token, jwtConfig.getPublicKey());
+            //
             String tokent = JwtUtils.generateToken(userInfo, jwtConfig.getPrivateKey(), jwtConfig.getExpire());
             CookieUtils.setCookie(request, response, jwtConfig.getCookieName(), tokent, jwtConfig.getCookieMaxAge(), true);
         } catch (Exception e) {
